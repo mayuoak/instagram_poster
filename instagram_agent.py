@@ -1,12 +1,6 @@
 import requests
-from transformers import LlamaForCausalLM, LlamaTokenizer
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
-from huggingface_hub import login
 from PIL import Image, ImageDraw, ImageFont
 from instagrapi import Client
-import pdb
-
 
 # Get a quote from ZenQuotes API
 def get_quote():
@@ -19,18 +13,9 @@ def get_quote():
     else:
         return "Could not fetch quote."
 
-# Generate Instagram caption with viral hashtags
+# Generate Instagram caption with basic hashtags
 def generate_caption(quote):
-    pdb.set_trace()
-    model_name = "meta-llama/Llama-3.2-1B"
-    tokenizer = AutoTokenizer.from_pretrained(model_name, legacy=False)
-    model = AutoModelForCausalLM.from_pretrained(model_name)
-
-    prompt = f"Create a viral Instagram caption for the quote: \"{quote}\" with popular hashtags"
-    inputs = tokenizer(prompt, return_tensors="pt")
-
-    outputs = model.generate(**inputs, max_length=100, num_return_sequences=1)
-    caption = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    caption = f"{quote} #inspiration #motivation #dailyquote #positivity #wisdom"
     return caption
 
 # Wrap text for better fit
@@ -59,23 +44,19 @@ def create_image(quote):
     img = Image.new('RGB', (1080, 1920), color='black')
     draw = ImageDraw.Draw(img)
 
-    # Start with a reasonably large font size
     font_size = 60
     try:
         font = ImageFont.truetype("DejaVuSans.ttf", font_size)
     except:
         font = ImageFont.load_default()
 
-    # Wrap text and adjust font size
     max_width = img.width * 0.9
     lines = wrap_text(draw, quote, font, max_width)
 
-    # Calculate total text height with increased line spacing
     line_height = draw.textbbox((0, 0), "A", font=font)[3] - draw.textbbox((0, 0), "A", font=font)[1]
-    line_spacing = 10  # Added extra spacing between lines
+    line_spacing = 10
     total_height = (line_height + line_spacing) * len(lines)
 
-    # Scale text size within reasonable bounds
     while total_height < img.height * 0.4 and font_size < 150:
         font_size += 5
         try:
@@ -96,10 +77,8 @@ def create_image(quote):
         line_height = draw.textbbox((0, 0), "A", font=font)[3] - draw.textbbox((0, 0), "A", font=font)[1]
         total_height = (line_height + line_spacing) * len(lines)
 
-    # Center text vertically
     y = (img.height - total_height) // 2
 
-    # Draw each line with extra spacing
     for line in lines:
         bbox = draw.textbbox((0, 0), line, font=font)
         text_width = bbox[2] - bbox[0]
@@ -113,7 +92,7 @@ def create_image(quote):
 def handle_security_challenge(cl):
     challenge = cl.challenge_resolve(cl.last_json.get('challenge', {}).get('url'))
     if challenge == "select_verify_method":
-        cl.challenge_select_verify_method(1)  # Usually 1 = email, 0 = phone
+        cl.challenge_select_verify_method(1)
         code = input("Enter the confirmation code sent to your email: ")
         cl.challenge_send_code(code)
 
@@ -130,22 +109,18 @@ def post_to_instagram(username, password, image_path):
             return
 
     try:
-        cl.photo_upload(image_path, caption="Check out this quote!")
+        caption = generate_caption(get_quote())
+        cl.photo_upload(image_path, caption=caption)
         cl.photo_upload_to_story(image_path)
         print("Image posted to Instagram story and feed!")
     except Exception as e:
         print(f"Failed to post image: {e}")
 
-# Create the Instagram post
 if __name__ == "__main__":
-    login(token='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')
     quote = get_quote()
     print(f"Quote: {quote}")
 
     if "Could not fetch" not in quote:
-        caption = '#inspiration, #dailyquote, #inspire' #generate_caption(quote)
-        print("\nInstagram Caption:\n")
-        print(caption)
         create_image(quote)
         print("\nImage saved as 'quote_post.jpg'")
         post_to_instagram("dailyquote785", "temp@1234", "quote_post.jpg")
