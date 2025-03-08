@@ -103,14 +103,14 @@ def handle_security_challenge(cl):
 def post_to_instagram(username, password, image_path):
     cl = Client()
 
-    # Load session from GitHub secret
-    session = json.loads(os.environ["sess"])
-    # Save the session to a temporary file
-    with open("session.json", "w") as f:
-        json.dump(session, f)
+    # # Load session from GitHub secret
+    # session = json.loads(os.environ["sess"])
+    # # Save the session to a temporary file
+    # with open("session.json", "w") as f:
+    #     json.dump(session, f)
 
-    # Load settings from the file
-    cl.load_settings("session.json")
+    # # Load settings from the file
+    # cl.load_settings("session.json")
 
     try:
         cl.login(username, password)
