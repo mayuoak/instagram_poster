@@ -103,7 +103,7 @@ def post_to_instagram(username, password, image_path):
     cl = Client()
 
     # Load session from GitHub secret
-    session = json.loads(os.environ["IG_SESSION"])
+    session = json.loads(os.environ["sess"])
     cl.load_settings(session)
     # try:
     #     cl.login(username, password)
