@@ -116,7 +116,7 @@ def post_to_instagram(username, password, image_path):
     except Exception as e:
         if "challenge_required" in str(e):
             handle_security_challenge(cl)
-        elif "two_factor_required" in str(e):
+        elif "Two-factor authentication required" in str(e):
             verification_code = os.getenv("IG_2FA_CODE")
             cl.two_factor_login(username, password, verification_code)
         else:
