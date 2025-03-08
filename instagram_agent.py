@@ -103,14 +103,14 @@ def handle_security_challenge(cl):
 def post_to_instagram(username, password, image_path):
     cl = Client()
 
-    # Load session from GitHub secret
-    session = json.loads(os.environ["sess"])
-    # Save the session to a temporary file
-    with open("session.json", "w") as f:
-        json.dump(session, f)
+    # # Load session from GitHub secret
+    # session = json.loads(os.environ["sess"])
+    # # Save the session to a temporary file
+    # with open("session.json", "w") as f:
+    #     json.dump(session, f)
 
-    # Load settings from the file
-    cl.load_settings("session.json")
+    # # Load settings from the file
+    # cl.load_settings("session.json")
 
     try:
         cl.login(username, password)
@@ -140,14 +140,14 @@ def post_to_instagram(username, password, image_path):
     # #         print(f"Login failed: {e}")
     # #         return
 
-    # try:
-    #     cl.login(username, password)
-    #     caption = generate_caption(get_quote())
-    #     cl.photo_upload(image_path, caption=caption)
-    #     cl.photo_upload_to_story(image_path)
-    #     print("Image posted to Instagram story and feed!")
-    # except Exception as e:
-    #     print(f"Failed to post image: {e}")
+    try:
+        #cl.login(username, password)
+        caption = generate_caption(get_quote())
+        cl.photo_upload(image_path, caption=caption)
+        cl.photo_upload_to_story(image_path)
+        print("Image posted to Instagram story and feed!")
+    except Exception as e:
+        print(f"Failed to post image: {e}")
 
 if __name__ == "__main__":
     quote = get_quote()
