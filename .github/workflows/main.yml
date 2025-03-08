@@ -1,0 +1,36 @@
+name: Run Quote Script 5 Times Daily
+
+on:
+  schedule:
+    - cron: '0 0,4,8,12,16 * * *' # Runs at midnight, 4am, 8am, 12pm, and 4pm UTC
+
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Run the script
+        run: |
+          source venv/bin/activate
+          python instagram_agent.py
+
+      - name: Cleanup
+        run: |
+          deactivate
+          rm -rf venv
