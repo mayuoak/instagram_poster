@@ -1,6 +1,7 @@
 import requests
 from PIL import Image, ImageDraw, ImageFont
 from instagrapi import Client
+import json
 
 # Get a quote from ZenQuotes API
 def get_quote():
@@ -99,16 +100,21 @@ def handle_security_challenge(cl):
 # Post image to Instagram story and feed
 def post_to_instagram(username, password, image_path):
     cl = Client()
-    try:
-        cl.login(username, password)
-    except Exception as e:
-        if "challenge_required" in str(e):
-            handle_security_challenge(cl)
-        else:
-            print(f"Login failed: {e}")
-            return
+
+    # Load session from GitHub secret
+    session = json.loads(os.environ["IG_SESSION"])
+    cl.load_settings(session)
+    # try:
+    #     cl.login(username, password)
+    # except Exception as e:
+    #     if "challenge_required" in str(e):
+    #         handle_security_challenge(cl)
+    #     else:
+    #         print(f"Login failed: {e}")
+    #         return
 
     try:
+        cl.login(username, password)
         caption = generate_caption(get_quote())
         cl.photo_upload(image_path, caption=caption)
         cl.photo_upload_to_story(image_path)
