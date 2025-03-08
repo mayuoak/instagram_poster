@@ -156,6 +156,7 @@ if __name__ == "__main__":
     if "Could not fetch" not in quote:
         create_image(quote)
         print("\nImage saved as 'quote_post.jpg'")
-        post_to_instagram("dailyquote785", "temp@1234", "quote_post.jpg")
+        password = os.getenv("password")
+        post_to_instagram("dailyquote785", password, "quote_post.jpg")
     else:
         print("Failed to create a post.")
