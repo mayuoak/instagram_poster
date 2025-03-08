@@ -1,6 +1,7 @@
 import os
 import requests
 from PIL import Image, ImageDraw, ImageFont
+import instagrapi
 from instagrapi import Client
 import json
 
@@ -113,32 +114,40 @@ def post_to_instagram(username, password, image_path):
 
     try:
         cl.login(username, password)
-    except Exception as e:
-        if "challenge_required" in str(e):
-            handle_security_challenge(cl)
-        elif "Two-factor authentication required" in str(e):
-            verification_code = os.getenv("IG_2FA_CODE")
-            cl.two_factor_login(username, password, verification_code)
-        else:
-            print(f"Login failed: {e}")
-            return
+    except instagrapi.exceptions.TwoFactorRequired:
+        verification_code = os.getenv("IG_2FA_CODE")
+        if not verification_code:
+            raise Exception("2FA code is missing! Please set IG_2FA_CODE in your GitHub secrets.")
+        cl.login(username, password, verification_code=verification_code)
+
     # try:
     #     cl.login(username, password)
     # except Exception as e:
     #     if "challenge_required" in str(e):
     #         handle_security_challenge(cl)
+    #     elif "Two-factor authentication required" in str(e):
+    #         verification_code = os.getenv("IG_2FA_CODE")
+    #         cl.two_factor_login(username, password, verification_code)
     #     else:
     #         print(f"Login failed: {e}")
     #         return
+    # # try:
+    # #     cl.login(username, password)
+    # # except Exception as e:
+    # #     if "challenge_required" in str(e):
+    # #         handle_security_challenge(cl)
+    # #     else:
+    # #         print(f"Login failed: {e}")
+    # #         return
 
-    try:
-        cl.login(username, password)
-        caption = generate_caption(get_quote())
-        cl.photo_upload(image_path, caption=caption)
-        cl.photo_upload_to_story(image_path)
-        print("Image posted to Instagram story and feed!")
-    except Exception as e:
-        print(f"Failed to post image: {e}")
+    # try:
+    #     cl.login(username, password)
+    #     caption = generate_caption(get_quote())
+    #     cl.photo_upload(image_path, caption=caption)
+    #     cl.photo_upload_to_story(image_path)
+    #     print("Image posted to Instagram story and feed!")
+    # except Exception as e:
+    #     print(f"Failed to post image: {e}")
 
 if __name__ == "__main__":
     quote = get_quote()
