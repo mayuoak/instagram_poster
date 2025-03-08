@@ -27,7 +27,7 @@ jobs:
 
       - name: Run the script
         env:
-          IG_SESSION: ${{ secrets.sess }}
+          sess: ${{ secrets.sess }}
         run: |
           source venv/bin/activate
           python instagram_agent.py
