@@ -28,6 +28,7 @@ jobs:
       - name: Run the script
         env:
           sess: ${{ secrets.sess }}
+          IG_2FA_CODE: ${{ secrets.IG_2FA_CODE }}
         run: |
           source venv/bin/activate
           python instagram_agent.py
