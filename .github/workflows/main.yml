@@ -2,7 +2,7 @@ name: Run Quote Script 5 Times Daily
 
 on:
   schedule:
-    - cron: '31 2 * * *' # Runs at 2:30 UTC every day # Runs at midnight, 4am, 8am, 12pm, and 4pm UTC
+    - cron: '55 2 * * *' # Runs at 2:30 UTC every day # Runs at midnight, 4am, 8am, 12pm, and 4pm UTC
 
   workflow_dispatch: # Allows manual triggering
 
