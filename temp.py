@@ -148,6 +148,6 @@ if __name__ == "__main__":
         print(caption)
         create_image(quote)
         print("\nImage saved as 'quote_post.jpg'")
-        post_to_instagram("dailyquote785", "temp@1234", "quote_post.jpg")
+        post_to_instagram("dailyquote785", , "quote_post.jpg")
     else:
         print("Failed to create a post.")
