@@ -4,6 +4,7 @@ from PIL import Image, ImageDraw, ImageFont
 import instagrapi
 from instagrapi import Client
 import json
+from hashtags import generate_metadata
 
 # Get a quote from ZenQuotes API
 def get_quote():
@@ -18,7 +19,9 @@ def get_quote():
 
 # Generate Instagram caption with basic hashtags
 def generate_caption(quote):
-    caption = f"{quote} #inspiration #motivation #dailyquote #positivity #wisdom"
+    gm = generate_metadata()
+    hashtags = gm.generate_hashtags(quote)
+    caption = f"{quote} {hashtags}"
     return caption
 
 # Wrap text for better fit
