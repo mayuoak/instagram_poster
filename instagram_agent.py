@@ -5,7 +5,7 @@ import instagrapi
 from instagrapi import Client
 import json
 from hashtags import generate_metadata
-import imageio
+import imageio.v2 as imageio
 
 # Get a quote from ZenQuotes API
 def get_quote():
@@ -89,7 +89,7 @@ def create_image(quote, image_name):
     frames[0].convert('RGB').save(image_name+'.jpg')
     print('Creating reel...')
     # Save the frames as an MP4 video for reels using imageio
-    with imageio.get_writer(image_name+'.mp4', fps=2) as writer:
+    with imageio.get_writer(image_name+'.mp4', fps=2, macro_block_size=1) as writer:
         for i, frame in enumerate(frames):
             temp_frame_path = f'temp_frame_{i}.jpg'
             frame.save(temp_frame_path)

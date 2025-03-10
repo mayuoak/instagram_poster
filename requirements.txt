@@ -4,3 +4,4 @@ instagrapi
 torch
 transformers
 imageio[ffmpeg]
+moviepy
