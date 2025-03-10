@@ -122,8 +122,8 @@ def post_to_instagram(username, password, image_path):
     try:
         #cl.login(username, password)
         caption = generate_caption(get_quote())
-        cl.photo_upload(image_path+'.jpg', caption=caption)
-        cl.photo_upload_to_story(image_path+'.jpg')
+        #cl.photo_upload(image_path+'.jpg', caption=caption)
+        #cl.photo_upload_to_story(image_path+'.jpg')
         clip = VideoFileClip(image_path+'.mp4')
         clip.write_videofile('reencoded_vintage_quote_post_reel.mp4', codec='libx264', fps=24)
         VIDEO_PATH = 'reencoded_vintage_quote_post_reel.mp4'
