@@ -24,75 +24,64 @@ def generate_caption(quote):
     caption = f"{quote} {hashtags}"
     return caption
 
-# Wrap text for better fit
-def wrap_text(draw, text, font, max_width):
-    lines = []
+# Wrap text to fit within bounds
+def wrap_text(text, font, max_width, draw):
     words = text.split()
-    current_line = ""
-
+    lines = []
+    current_line = []
     for word in words:
-        test_line = f"{current_line} {word}".strip()
-        bbox = draw.textbbox((0, 0), test_line, font=font)
-        width = bbox[2] - bbox[0]
-        if width <= max_width:
-            current_line = test_line
+        test_line = ' '.join(current_line + [word])
+        text_width = draw.textlength(test_line, font=font)
+        if text_width <= max_width:
+            current_line.append(word)
         else:
-            lines.append(current_line)
-            current_line = word
-
+            lines.append(' '.join(current_line))
+            current_line = [word]
     if current_line:
-        lines.append(current_line)
-
+        lines.append(' '.join(current_line))
     return lines
 
-# Create a high-quality image with dynamically scaled text for the quote
-def create_image(quote):
-    img = Image.new('RGB', (1080, 1920), color='black')
-    draw = ImageDraw.Draw(img)
 
+def create_image(quote):
+    img = Image.open('old_paper_texture.jpg').convert('RGB')
+    #draw = ImageDraw.Draw(img)
+    img = img.resize((1080, 1080))
     font_size = 60
     try:
         font = ImageFont.truetype("DejaVuSans.ttf", font_size)
     except:
         font = ImageFont.load_default()
+    
+    text_color = (50, 30, 10)  # Dark brown for vintage look
 
-    max_width = img.width * 0.9
-    lines = wrap_text(draw, quote, font, max_width)
+    # Create a drawable image
+    combined = img.copy()
+    draw = ImageDraw.Draw(combined)
 
-    line_height = draw.textbbox((0, 0), "A", font=font)[3] - draw.textbbox((0, 0), "A", font=font)[1]
-    line_spacing = 10
-    total_height = (line_height + line_spacing) * len(lines)
+    # Wrap the quote and calculate position
+    max_text_width = combined.width - 100
+    wrapped_text = wrap_text(quote, font, max_text_width, draw)
 
-    while total_height < img.height * 0.4 and font_size < 150:
-        font_size += 5
-        try:
-            font = ImageFont.truetype("DejaVuSans.ttf", font_size)
-        except:
-            font = ImageFont.load_default()
-        lines = wrap_text(draw, quote, font, max_width)
-        line_height = draw.textbbox((0, 0), "A", font=font)[3] - draw.textbbox((0, 0), "A", font=font)[1]
-        total_height = (line_height + line_spacing) * len(lines)
+    # Calculate total text height
+    text_height = sum(draw.textbbox((0, 0), line, font=font)[3] - draw.textbbox((0, 0), line, font=font)[1] for line in wrapped_text)
+    text_y = (combined.height - text_height) // 2
 
-    while total_height > img.height * 0.8 and font_size > 30:
-        font_size -= 5
-        try:
-            font = ImageFont.truetype("DejaVuSans.ttf", font_size)
-        except:
-            font = ImageFont.load_default()
-        lines = wrap_text(draw, quote, font, max_width)
-        line_height = draw.textbbox((0, 0), "A", font=font)[3] - draw.textbbox((0, 0), "A", font=font)[1]
-        total_height = (line_height + line_spacing) * len(lines)
+    # Draw the wrapped text
+    for line in wrapped_text:
+        text_width = draw.textlength(line, font=font)
+        text_x = (combined.width - text_width) // 2
+        draw.text((text_x, text_y), line, font=font, fill=text_color)
+        text_y += draw.textbbox((0, 0), line, font=font)[3] - draw.textbbox((0, 0), line, font=font)[1]
 
-    y = (img.height - total_height) // 2
+    # Create frames with subtle flicker effect
+    frames = []
+    for i in range(10):
+        enhancer = ImageEnhance.Brightness(combined)
+        flicker = enhancer.enhance(0.95 + (i % 2) * 0.05)  # Alternates brightness
+        frames.append(flicker)
 
-    for line in lines:
-        bbox = draw.textbbox((0, 0), line, font=font)
-        text_width = bbox[2] - bbox[0]
-        x = (img.width - text_width) // 2
-        draw.text((x, y), line, font=font, fill='white')
-        y += line_height + line_spacing
-
-    img.save("quote_post.jpg", quality=95)
+    # Save as animated GIF
+    frames[0].save('quote_post.gif', save_all=True, append_images=frames[1:], duration=100, loop=0)
 
 # Handle Instagram security challenge
 def handle_security_challenge(cl):
@@ -129,8 +118,8 @@ if __name__ == "__main__":
 
     if "Could not fetch" not in quote:
         create_image(quote)
-        print("\nImage saved as 'quote_post.jpg'")
+        print("\nImage saved as 'quote_post.gif'")
         password = os.getenv("password")
-        post_to_instagram("dailyquote785", password, "quote_post.jpg")
+        post_to_instagram("dailyquote785", password, "quote_post.gif")
     else:
         print("Failed to create a post.")
