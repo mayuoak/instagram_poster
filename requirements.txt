@@ -3,3 +3,4 @@ Pillow
 instagrapi
 torch
 transformers
+imageio

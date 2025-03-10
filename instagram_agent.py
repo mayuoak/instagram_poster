@@ -44,6 +44,7 @@ def wrap_text(text, font, max_width, draw):
 
 
 def create_image(quote, image_name):
+    print('Creating post, story and reel...')
     img = Image.open('old_paper_texture.jpg').convert('RGB')
     #draw = ImageDraw.Draw(img)
     img = img.resize((1080, 1080))
@@ -82,9 +83,11 @@ def create_image(quote, image_name):
         frames.append(flicker)
 
     # Save as animated GIF
+    print('creating gif...')
     frames[0].save(image_name+'.gif', save_all=True, append_images=frames[1:], duration=100, loop=0)
+    print('Creating post and story...')
     frames[0].convert('RGB').save(image_name+'.jpg')
-    frames[0].save(image_name+'.mp4', save_all=True, append_images=frames[1:], duration=500, loop=0, format='mp4')
+    print('Creating reel...')
     # Save the frames as an MP4 video for reels using imageio
     with imageio.get_writer(image_name+'.mp4', fps=2) as writer:
         for frame in frames:
