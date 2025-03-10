@@ -90,8 +90,11 @@ def create_image(quote, image_name):
     print('Creating reel...')
     # Save the frames as an MP4 video for reels using imageio
     with imageio.get_writer(image_name+'.mp4', fps=2) as writer:
-        for frame in frames:
-            writer.append_data(imageio.v3.imread(frame))
+        for i, frame in enumerate(frames):
+            temp_frame_path = f'temp_frame_{i}.jpg'
+            frame.save(temp_frame_path)
+            writer.append_data(imageio.imread(temp_frame_path))
+            os.remove(temp_frame_path)
 
 # Handle Instagram security challenge
 def handle_security_challenge(cl):
