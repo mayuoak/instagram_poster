@@ -6,7 +6,6 @@ from instagrapi import Client
 import json
 from hashtags import generate_metadata
 import imageio.v2 as imageio
-from instagrapi.exceptions import MediaNotUploaded
 
 # Get a quote from ZenQuotes API
 def get_quote():
@@ -122,13 +121,7 @@ def post_to_instagram(username, password, image_path):
         caption = generate_caption(get_quote())
         cl.photo_upload(image_path+'.jpg', caption=caption)
         cl.photo_upload_to_story(image_path+'.jpg')
-        try:
-            media = cl.clip_upload(image_path+'.mp4', caption=caption)
-            print(f"Reel uploaded successfully: {media.dict()}")
-        except MediaNotUploaded as e:
-            print(f"Failed to upload reel: {e}")
-        except Exception as e:
-            print(f"An unexpected error occurred: {e}")
+        media = cl.clip_upload(image_path+'.mp4', caption=caption)
         print("Image posted to Instagram story, reel and feed!")
     except Exception as e:
         print(f"Failed to post image: {e}")
