@@ -4,4 +4,4 @@ instagrapi
 torch
 transformers
 imageio[ffmpeg]
-moviepy
+moviepy==1.0.3
