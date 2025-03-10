@@ -42,7 +42,7 @@ def wrap_text(text, font, max_width, draw):
     return lines
 
 
-def create_image(quote):
+def create_image(quote, image_name):
     img = Image.open('old_paper_texture.jpg').convert('RGB')
     #draw = ImageDraw.Draw(img)
     img = img.resize((1080, 1080))
@@ -81,7 +81,9 @@ def create_image(quote):
         frames.append(flicker)
 
     # Save as animated GIF
-    frames[0].save('quote_post.gif', save_all=True, append_images=frames[1:], duration=100, loop=0)
+    frames[0].save(image_name+'.gif', save_all=True, append_images=frames[1:], duration=100, loop=0)
+    frames[0].convert('RGB').save(image_name+'.jpg')
+    frames[0].save(image_name+'.mp4', save_all=True, append_images=frames[1:], duration=500, loop=0, format='mp4')
 
 # Handle Instagram security challenge
 def handle_security_challenge(cl):
@@ -106,9 +108,10 @@ def post_to_instagram(username, password, image_path):
     try:
         #cl.login(username, password)
         caption = generate_caption(get_quote())
-        cl.photo_upload(image_path, caption=caption)
-        cl.photo_upload_to_story(image_path)
-        print("Image posted to Instagram story and feed!")
+        cl.photo_upload(image_path+'.jpg', caption=caption)
+        cl.photo_upload_to_story(image_path+'.jpg')
+        media = cl.clip_upload(image_path+'.mp4', caption=caption)
+        print("Image posted to Instagram story, reel and feed!")
     except Exception as e:
         print(f"Failed to post image: {e}")
 
@@ -117,9 +120,10 @@ if __name__ == "__main__":
     print(f"Quote: {quote}")
 
     if "Could not fetch" not in quote:
-        create_image(quote)
-        print("\nImage saved as 'quote_post.gif'")
+        image_name = 'quote_post'
+        create_image(quote, image_name)
+        print(f"\nImage saved as {image_name}")
         password = os.getenv("password")
-        post_to_instagram("dailyquote785", password, "quote_post.gif")
+        post_to_instagram("dailyquote785", password, image_name)
     else:
         print("Failed to create a post.")
