@@ -1,6 +1,6 @@
 import os
 import requests
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 import instagrapi
 from instagrapi import Client
 import json
