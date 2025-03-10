@@ -1,3 +1,6 @@
 venv
 *.jpg
 *.png
+*.gif
+*.mp4
+*pyc
