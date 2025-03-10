@@ -6,7 +6,10 @@ from instagrapi import Client
 import json
 from hashtags import generate_metadata
 import imageio.v2 as imageio
+from moviepy.editor import VideoFileClip
 
+
+local = True
 # Get a quote from ZenQuotes API
 def get_quote():
     response = requests.get("https://zenquotes.io/api/random")
@@ -121,7 +124,10 @@ def post_to_instagram(username, password, image_path):
         caption = generate_caption(get_quote())
         cl.photo_upload(image_path+'.jpg', caption=caption)
         cl.photo_upload_to_story(image_path+'.jpg')
-        media = cl.clip_upload(image_path+'.mp4', caption=caption)
+        clip = VideoFileClip(image_path+'.mp4')
+        clip.write_videofile('reencoded_vintage_quote_post_reel.mp4', codec='libx264', fps=24)
+        VIDEO_PATH = 'reencoded_vintage_quote_post_reel.mp4'
+        media = cl.clip_upload(VIDEO_PATH, caption=caption)
         print("Image posted to Instagram story, reel and feed!")
     except Exception as e:
         print(f"Failed to post image: {e}")
@@ -129,6 +135,7 @@ def post_to_instagram(username, password, image_path):
 if __name__ == "__main__":
     quote = get_quote()
     print(f"Quote: {quote}")
+    
 
     if "Could not fetch" not in quote:
         image_name = 'quote_post'
